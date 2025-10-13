@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Catálogo de Vídeos da Internet</title>
     <link rel="stylesheet" href="style.css">
 
@@ -11,44 +11,42 @@
 </head>
 <body>
     <header>        
-        <h1>Catálogo Global de Vídeos</h1>
-        <p>Encontre vídeos por tags e crie seus compilados.</p>
         <button id="toggleDarkMode" style="margin-top: 20px;">🌙 Alternar Tema</button>
         <button id="openAddModal" style="background-color: #28a745; margin-left: 10px;">
             + Adicionar Novo Vídeo
         </button>
     </header>
 
-    
-    <section class="filter-area">
-        <h2>Filtro de Conteúdo</h2>
-        <select id="tagSelector">
-            <option value="">Selecione tags para filtrar...</option>
-        </select>
-        
-        <div id="activeFilters" class="active-filters-container">
+    <main>
+        <section class="filter-area">
+            <h2>Filtro de Conteúdo</h2>
+            <select id="tagSelector">
+                <option value="">Selecione tags para filtrar...</option>
+            </select>
+            
+            <div id="activeFilters" class="active-filters-container">
+                </div>
+        </section>
+
+        <hr>
+
+        <section class="results-area">
+            <h2>Resultados Encontrados:</h2>
+            <div class="table-container">
+                <table id="videoTable">
+                    <thead>
+                        <tr>
+                            <th data-column="titulo">Título</th>
+                            <th data-column="descricao">Descrição</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="videoList">
+                        </tbody>
+                </table>
             </div>
-    </section>
-
-    <hr>
-
-    <section class="results-area">
-        <h2>Resultados Encontrados:</h2>
-        <div class="table-container">
-            <table id="videoTable">
-                <thead>
-                    <tr>
-                        <th data-column="titulo">Título</th>
-                        <th data-column="descricao">Descrição</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="videoList">
-                    </tbody>
-            </table>
-        </div>
-    </section>
-    
+        </section>
+    </main>
 
     <div id="videoModal" class="modal">
         <div class="modal-content">

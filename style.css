@@ -1,13 +1,14 @@
-/* ======== BASE ======== */
-/* NO INÍCIO DO style.css */
+/* ======== CONFIGURAÇÃO UNIVERSAL ======== */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
+/* ======== BASE (Comportamento para Desktop) ======== */
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 20px; /* Padding padrão para desktop */
+    min-height: 100vh; /* Garante que o body ocupe a altura total */
     background-color: #f4f4f9;
     color: #222;
     transition: background-color 0.3s, color 0.3s;
@@ -18,76 +19,17 @@ header {
     margin-bottom: 30px;
 }
 
-
-/* ======== BASE ======== */
-/* ... (Mantenha o resto das regras BASE) ... */
-
+/* Define o limite de largura e centraliza para telas grandes */
 main {
     max-width: 1000px;
-    width: 95%; /* Novo: Usa 95% da largura da tela */
-    margin: 20px auto; /* Novo: Adiciona margem em cima/baixo e centraliza */
+    width: 90%; /* Contrai um pouco para não tocar nas bordas em telas médias */
+    margin: 30px auto; /* Centraliza e adiciona margem superior/inferior para respiro */
     background-color: #fff;
-    padding: 20px;
+    padding: 25px; /* Padding interno maior para desktop */
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
 }
-
-section {
-    margin-bottom: 30px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    transition: border-color 0.3s, background-color 0.3s;
-}
-
-/* Garante que selects também ocupem 100% da largura do contêiner */
-input[type="text"], input[type="url"], textarea, select {
-    width: 100%;
-/* ... (Mantenha o resto) ... */
-}
-
-/* ======== RESPONSIVO (Ajustes Finais de Espaçamento) ======== */
-/* ======== RESPONSIVO ======== */
-@media (max-width: 700px) {
-    
-    /* Remove todo o padding do body em telas pequenas para maximizar o espaço */
-    body {
-        padding: 0; 
-    }
-
-    /* Reduz o padding do MAIN para telas pequenas */
-    main {
-        padding: 10px; 
-        max-width: 100%; /* Garante que ocupe a largura máxima disponível */
-        margin: 0 auto; /* Remove margem lateral */
-    }
-
-    /* Reduz ainda mais o padding das células para compressão */
-    th, td {
-        padding: 8px 5px; /* Reduz o padding horizontal para 5px */
-        font-size: 0.8rem; /* Reduz a fonte levemente (era 0.85rem) */
-    }
-    
-    /* Reduz o tamanho dos botões na coluna de ações */
-    .actions button,
-    .actions a {
-        padding: 6px 8px; /* Padding menor */
-        font-size: 0.75em; /* Fonte ainda menor nos botões */
-    }
-    
-    /* O restante do bloco @media permanece o mesmo */
-    .actions {
-        gap: 4px;
-    }
-    .modal-content {
-        width: 95%;
-        margin: 5% auto;
-        padding: 20px;
-    }
-}
-
-
 
 section {
     margin-bottom: 30px;
@@ -103,7 +45,6 @@ input[type="text"], input[type="url"], textarea, select {
     margin-bottom: 10px;
     border: 1px solid #bbb;
     border-radius: 6px;
-    box-sizing: border-box;
     background-color: #fff;
     color: #222;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
@@ -141,7 +82,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
-    font-size: 0.95rem;
+    font-size: 1rem; /* Fonte ligeiramente maior para desktop */
     border-radius: 8px;
     overflow: hidden;
 }
@@ -152,9 +93,21 @@ thead {
 }
 
 th, td {
-    padding: 12px 15px;
+    padding: 15px 20px; /* Mais padding para desktop */
     text-align: left;
+    word-wrap: break-word; /* Ajuda a evitar estouro de palavras muito longas */
 }
+
+/* Ajustes de largura e estilo para colunas no desktop */
+#videoTable tbody td:nth-child(1) { /* Coluna Título */
+    max-width: 350px;
+    font-weight: bold;
+}
+#videoTable tbody td:nth-child(2) { /* Coluna Descrição */
+    max-width: 400px;
+    line-height: 1.4;
+}
+
 
 th {
     cursor: pointer;
@@ -286,7 +239,7 @@ tbody tr:hover {
     text-decoration: none;
 }
 
-/* ======== DARK MODE ======== */
+/* ======== DARK MODE (Estilos) ======== */
 body.dark-mode {
     background-color: #121212;
     color: #e4e4e4;
@@ -347,16 +300,38 @@ body.dark-mode .close-button:hover {
 }
 
 
-/* ======== RESPONSIVO ======== */
+/* ======== RESPONSIVO (Ajustes Finais para Celular) ======== */
 @media (max-width: 700px) {
+    /* Remove o padding do body */
+    body {
+        padding: 0; 
+    }
+
+    /* O main ocupa 100% da largura, remove margens e paddings desnecessários */
+    main {
+        width: 100%; 
+        max-width: none;
+        margin: 0; 
+        padding: 10px; /* Reduz o padding interno do main */
+    }
+
+    /* Reduz ainda mais o padding das células para compressão da tabela */
     th, td {
-        padding: 8px;
-        font-size: 0.85rem;
+        padding: 8px 5px; 
+        font-size: 0.8rem; /* Fonte menor no celular */
+    }
+    
+    /* Reduz o tamanho dos botões na coluna de ações */
+    .actions button,
+    .actions a {
+        padding: 6px 8px;
+        font-size: 0.75em;
     }
 
     .actions {
         gap: 4px;
     }
+    
     .modal-content {
         width: 95%;
         margin: 5% auto;
