@@ -1,4 +1,9 @@
 /* ======== BASE ======== */
+/* NO INÍCIO DO style.css */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
@@ -13,15 +18,76 @@ header {
     margin-bottom: 30px;
 }
 
+
+/* ======== BASE ======== */
+/* ... (Mantenha o resto das regras BASE) ... */
+
 main {
     max-width: 1000px;
-    margin: 0 auto;
+    width: 95%; /* Novo: Usa 95% da largura da tela */
+    margin: 20px auto; /* Novo: Adiciona margem em cima/baixo e centraliza */
     background-color: #fff;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
 }
+
+section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+/* Garante que selects também ocupem 100% da largura do contêiner */
+input[type="text"], input[type="url"], textarea, select {
+    width: 100%;
+/* ... (Mantenha o resto) ... */
+}
+
+/* ======== RESPONSIVO (Ajustes Finais de Espaçamento) ======== */
+/* ======== RESPONSIVO ======== */
+@media (max-width: 700px) {
+    
+    /* Remove todo o padding do body em telas pequenas para maximizar o espaço */
+    body {
+        padding: 0; 
+    }
+
+    /* Reduz o padding do MAIN para telas pequenas */
+    main {
+        padding: 10px; 
+        max-width: 100%; /* Garante que ocupe a largura máxima disponível */
+        margin: 0 auto; /* Remove margem lateral */
+    }
+
+    /* Reduz ainda mais o padding das células para compressão */
+    th, td {
+        padding: 8px 5px; /* Reduz o padding horizontal para 5px */
+        font-size: 0.8rem; /* Reduz a fonte levemente (era 0.85rem) */
+    }
+    
+    /* Reduz o tamanho dos botões na coluna de ações */
+    .actions button,
+    .actions a {
+        padding: 6px 8px; /* Padding menor */
+        font-size: 0.75em; /* Fonte ainda menor nos botões */
+    }
+    
+    /* O restante do bloco @media permanece o mesmo */
+    .actions {
+        gap: 4px;
+    }
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
+    }
+}
+
+
 
 section {
     margin-bottom: 30px;

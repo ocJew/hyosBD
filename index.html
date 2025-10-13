@@ -19,36 +19,36 @@
         </button>
     </header>
 
-    <main>
-        <section class="filter-area">
-            <h2>Filtro de Conteúdo</h2>
-            <select id="tagSelector">
-                <option value="">Selecione tags para filtrar...</option>
-            </select>
-            
-            <div id="activeFilters" class="active-filters-container">
-                </div>
-        </section>
-
-        <hr>
-
-        <section class="results-area">
-            <h2>Resultados Encontrados:</h2>
-            <div class="table-container">
-                <table id="videoTable">
-                    <thead>
-                        <tr>
-                            <th data-column="titulo">Título</th>
-                            <th data-column="descricao">Descrição</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="videoList">
-                        </tbody>
-                </table>
+    
+    <section class="filter-area">
+        <h2>Filtro de Conteúdo</h2>
+        <select id="tagSelector">
+            <option value="">Selecione tags para filtrar...</option>
+        </select>
+        
+        <div id="activeFilters" class="active-filters-container">
             </div>
-        </section>
-    </main>
+    </section>
+
+    <hr>
+
+    <section class="results-area">
+        <h2>Resultados Encontrados:</h2>
+        <div class="table-container">
+            <table id="videoTable">
+                <thead>
+                    <tr>
+                        <th data-column="titulo">Título</th>
+                        <th data-column="descricao">Descrição</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="videoList">
+                    </tbody>
+            </table>
+        </div>
+    </section>
+    
 
     <div id="videoModal" class="modal">
         <div class="modal-content">
