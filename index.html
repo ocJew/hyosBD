@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Vídeos da Internet</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <header>        
+        <h1>Catálogo Global de Vídeos</h1>
+        <p>Encontre vídeos por tags e crie seus compilados.</p>
+        <button id="toggleDarkMode" style="margin-top: 20px;">🌙 Alternar Tema</button>
+        <button id="openAddModal" style="background-color: #28a745; margin-left: 10px;">
+            + Adicionar Novo Vídeo
+        </button>
+    </header>
+
+    <main>
+        <section class="filter-area">
+            <h2>Filtro de Conteúdo</h2>
+            <select id="tagSelector">
+                <option value="">Selecione tags para filtrar...</option>
+            </select>
+            
+            <div id="activeFilters" class="active-filters-container">
+                </div>
+        </section>
+
+        <hr>
+
+        <section class="results-area">
+            <h2>Resultados Encontrados:</h2>
+            <div class="table-container">
+                <table id="videoTable">
+                    <thead>
+                        <tr>
+                            <th data-column="titulo">Título</th>
+                            <th data-column="descricao">Descrição</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="videoList">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            <h2 id="modalTitle">Adicionar Novo Vídeo</h2>
+            
+            <section class="admin-form" id="admin-form-section">
+                <input type="url" id="url" placeholder="Link do Vídeo (YouTube, TikTok, etc.)" required>
+                <input type="text" id="titulo" placeholder="Título do Vídeo" required>
+                <input type="text" id="tags" placeholder="Tags (separadas por vírgula, ex: caneta, drible, humor)" required>
+                <textarea id="descricao" placeholder="Descrição ou utilidade"></textarea>
+                <button id="addButton">Salvar Vídeo</button>
+                <p id="message"></p>
+            </section>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
