@@ -11,14 +11,17 @@
 </head>
 <body>
     <header>        
-        <button id="toggleDarkMode" style="margin-top: 20px;">🌙 Alternar Tema</button>
+        <button id="toggleDarkMode" style="margin-top: 20px; background-color: #0057b300;">🌙</button>
         <button id="openAddModal" style="background-color: #28a745; margin-left: 10px;">
-            + Adicionar Novo Vídeo
+            +
+        </button>
+        <button id="toggleFilter" style="margin-left: 10px; background-color: #0057b300;">
+            🔍
         </button>
     </header>
 
     <main>
-        <section class="filter-area">
+        <section class="filter-area" id="filterContainer">
             <h2>Filtro de Conteúdo</h2>
             <select id="tagSelector">
                 <option value="">Selecione tags para filtrar...</option>
@@ -28,7 +31,7 @@
                 </div>
         </section>
 
-        <hr>
+        
 
         <section class="results-area">
             <h2>Resultados Encontrados:</h2>

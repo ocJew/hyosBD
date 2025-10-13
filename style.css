@@ -3,6 +3,17 @@
     box-sizing: border-box;
 }
 
+*{
+    font-size: 12px;
+}
+
+/* Define o estado inicial da seção de filtro como escondido */
+#filterContainer {
+    display: none; 
+    transition: all 0.3s ease-in-out; 
+}
+
+
 /* ======== BASE (Comportamento para Desktop) ======== */
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -305,6 +316,7 @@ body.dark-mode .close-button:hover {
     /* Remove o padding do body */
     body {
         padding: 0; 
+        overflow-x: hidden; /* Força a esconder o overflow horizontal */
     }
 
     /* O main ocupa 100% da largura, remove margens e paddings desnecessários */

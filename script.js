@@ -25,6 +25,9 @@ const message = document.getElementById('message');
 const videoList = document.getElementById('videoList');
 const tagSelector = document.getElementById('tagSelector');
 const activeFiltersContainer = document.getElementById('activeFilters');
+// NOVOS ELEMENTOS
+const filterContainer = document.getElementById('filterContainer');
+const toggleFilterButton = document.getElementById('toggleFilter');
 
 let activeTags = []; // Tags atualmente sendo usadas para filtrar (Chips)
 let allAvailableTags = new Set(); // Todas as tags encontradas nos vídeos (Dropdown)
@@ -177,7 +180,6 @@ async function listarVideosComFiltro() {
 // ---------------------------------------------
 
 function renderVideoItem(id, data) {
-    // Tags display não é mais usado na tabela, mas o dado existe no objeto data.
     const tr = document.createElement('tr');
     tr.id = `video-${id}`;
     tr.innerHTML = `
@@ -296,6 +298,18 @@ function getColumnIndex(columnName) {
 // 5. INICIALIZAÇÃO E DARK MODE
 // =================================================================
 
+// Lógica de Alternância do Filtro
+toggleFilterButton.addEventListener('click', () => {
+    const isVisible = filterContainer.style.display === 'block';
+    if (isVisible) {
+        filterContainer.style.display = 'none';
+        toggleFilterButton.textContent = '🔍';
+    } else {
+        filterContainer.style.display = 'block';
+        toggleFilterButton.textContent = '❌';
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Carrega lista completa
     listarVideosComFiltro();
@@ -306,9 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (savedDarkMode) {
         document.body.classList.add('dark-mode');
-        toggleDarkMode.textContent = '☀️ Modo Claro';
+        toggleDarkMode.textContent = '☀️';
     } else {
-        toggleDarkMode.textContent = '🌙 Modo Escuro';
+        toggleDarkMode.textContent = '🌙';
     }
 
     toggleDarkMode.addEventListener('click', () => {
@@ -316,8 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('darkMode', darkModeAtivo);
 
         toggleDarkMode.textContent = darkModeAtivo
-            ? '☀️ Modo Claro'
-            : '🌙 Modo Escuro';
+            ? '☀️'
+            : '🌙';
     });
 
     // 3. Lógica de Deep Link (AGORA DENTRO DO DOMContentLoaded no script.js)
@@ -328,12 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('videoModal');
         const urlInput = document.getElementById('url');
         
-        // Debug para ver o que está falhando (Verifique no Console!)
-        console.log("Deep Link Ativado. Link:", sharedLink);
-        console.log("Modal Encontrado:", !!modal);
-        console.log("Input URL Encontrado:", !!urlInput);
-
-
         if (modal && urlInput) {
             modal.style.display = 'block';
             urlInput.value = decodeURIComponent(sharedLink);
