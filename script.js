@@ -29,6 +29,8 @@ const activeFiltersContainer = document.getElementById('activeFilters');
 const filterContainer = document.getElementById('filterContainer');
 const toggleFilterButton = document.getElementById('toggleFilter');
 
+
+
 let activeTags = []; // Tags atualmente sendo usadas para filtrar (Chips)
 let allAvailableTags = new Set(); // Todas as tags encontradas nos vídeos (Dropdown)
 
@@ -180,21 +182,33 @@ async function listarVideosComFiltro() {
 // ---------------------------------------------
 
 function renderVideoItem(id, data) {
-    const tr = document.createElement('tr');
-    tr.id = `video-${id}`;
-    tr.innerHTML = `
-        <td>${data.titulo}</td>
-        <td>${data.descricao || '—'}</td>
-        <td class="actions">
-            <a href="${data.url}" target="_blank" class="play-btn">▶</a>
-            <button class="edit-btn" data-id="${id}">✏️</button>
-            <button class="delete-btn" data-id="${id}">🗑️</button>
-        </td>
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.id = `video-${id}`;
+
+    // Gera o HTML para as tags dentro do card
+    const tagsHtml = data.tags.map(tag => `<span class="card-tag">${tag}</span>`).join('');
+
+    card.innerHTML = `
+        <div class="card-content">
+            <h3 class="card-title">${data.titulo}</h3>
+            <p class="card-description">${data.descricao || 'Nenhuma descrição fornecida.'}</p>
+            <div class="card-tags-container">
+                ${tagsHtml}
+            </div>
+        </div>
+        <div class="card-actions">
+            <a href="${data.url}" target="_blank" class="action-btn play-btn" title="Assistir">▶️</a>
+            <button class="action-btn edit-btn" data-id="${id}" title="Editar">✏️</button>
+            <button class="action-btn delete-btn" data-id="${id}" title="Deletar">🗑️</button>
+        </div>
     `;
 
-    tr.querySelector('.delete-btn').addEventListener('click', () => deletarVideo(id, data.titulo));
-    tr.querySelector('.edit-btn').addEventListener('click', () => openModal(true, id, data));
-    videoList.appendChild(tr);
+    card.querySelector('.delete-btn').addEventListener('click', () => deletarVideo(id, data.titulo));
+    card.querySelector('.edit-btn').addEventListener('click', () => openModal(true, id, data));
+    
+    // ATENÇÃO: a videoList agora será uma div, não um tbody
+    videoList.appendChild(card); 
 }
 
 async function deletarVideo(id, titulo) {

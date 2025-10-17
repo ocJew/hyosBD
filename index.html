@@ -10,14 +10,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <header>        
-        <button id="toggleDarkMode" style="margin-top: 20px; background-color: #0057b300;">🌙</button>
-        <button id="openAddModal" style="background-color: #28a745; margin-left: 10px;">
-            +
-        </button>
-        <button id="toggleFilter" style="margin-left: 10px; background-color: #0057b300;">
-            🔍
-        </button>
+    <header>
+        <h1>Catálogo de Vídeos</h1>
+        <div class="header-actions">
+            <button id="toggleDarkMode" title="Alternar tema">🌙</button>
+            <button id="toggleFilter" title="Filtrar">🔍</button>
+            <button id="openAddModal" title="Adicionar Vídeo">+</button>
+        </div>
     </header>
 
     <main>
@@ -35,20 +34,10 @@
 
         <section class="results-area">
             <h2>Resultados Encontrados:</h2>
-            <div class="table-container">
-                <table id="videoTable">
-                    <thead>
-                        <tr>
-                            <th data-column="titulo">Título</th>
-                            <th data-column="descricao">Descrição</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="videoList">
-                        </tbody>
-                </table>
-            </div>
+            <div id="videoList" class="video-grid">
+                </div>
         </section>
+
     </main>
 
     <div id="videoModal" class="modal">

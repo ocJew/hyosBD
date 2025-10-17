@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 /* ======== CONFIGURAÇÃO UNIVERSAL ======== */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
 *{
-    font-size: 12px;
+    font-size: 17px;
 }
 
 /* Define o estado inicial da seção de filtro como escondido */
@@ -16,12 +18,14 @@
 
 /* ======== BASE (Comportamento para Desktop) ======== */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
+    /* NOVA FONTE */
+    font-family: 'Inter', sans-serif;
     margin: 0;
-    padding: 20px; /* Padding padrão para desktop */
-    min-height: 100vh; /* Garante que o body ocupe a altura total */
-    background-color: #f4f4f9;
-    color: #222;
+    padding: 20px;
+    min-height: 100vh;
+    /* CORES SUAVIZADAS */
+    background-color: #f8f9fa; /* Cinza muito claro */
+    color: #343a40; /* Cinza escuro, não preto puro */
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -32,14 +36,18 @@ header {
 
 /* Define o limite de largura e centraliza para telas grandes */
 main {
-    max-width: 1000px;
-    width: 90%; /* Contrai um pouco para não tocar nas bordas em telas médias */
-    margin: 30px auto; /* Centraliza e adiciona margem superior/inferior para respiro */
-    background-color: #fff;
-    padding: 25px; /* Padding interno maior para desktop */
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s;
+    max-width: 1200px; /* Um pouco mais largo para os cards */
+    width: 95%;
+    margin: 30px auto;
+    background-color: transparent; /* Remove o fundo branco do main */
+    padding: 0; /* Remove padding do main, já que os cards têm o seu */
+    border-radius: 0;
+    box-shadow: none; /* Remove a sombra do main */
+}
+
+body.dark-mode {
+    background-color: #0f172a; /* Azul bem escuro */
+    color: #e2e8f0; /* Cinza claro */
 }
 
 section {
@@ -350,3 +358,223 @@ body.dark-mode .close-button:hover {
         padding: 20px;
     }
 }
+
+/* EM: style.css (pode adicionar no final, antes das media queries) */
+
+/* ======== LAYOUT DE CARDS ======== */
+.video-grid {
+    display: grid;
+    /* Cria colunas flexíveis com no mínimo 300px */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.video-card {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Empurra as ações para baixo */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden; /* Garante que os cantos fiquem arredondados */
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-content {
+    padding: 18px;
+}
+
+.card-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #1a1a1a;
+}
+
+.card-description {
+    font-size: 0.9em;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.card-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.card-tag {
+    background-color: #eef5ff;
+    color: #0056b3;
+    font-size: 0.75em;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 15px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 18px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #e0e0e0;
+}
+
+.action-btn {
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em; /* Ajuste para emojis ficarem ok */
+}
+
+/* Ajustes para Dark Mode */
+body.dark-mode .video-card {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+body.dark-mode .video-card:hover {
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
+}
+body.dark-mode .card-title {
+    color: #f1f1f1;
+}
+body.dark-mode .card-description {
+    color: #aaa;
+}
+body.dark-mode .card-tag {
+    background-color: #003366;
+    color: #aaccff;
+}
+body.dark-mode .card-actions {
+    background-color: #252525;
+    border-top-color: #333;
+}
+
+
+/* EM: style.css */
+
+header {
+    display: flex;
+    justify-content: space-between; /* Alinha itens */
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto 30px auto; /* Centraliza o header */
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+header h1 { /* Adicione um H1 no seu HTML para o título! */
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.header-actions button {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #555;
+    font-size: 1.5em; /* Aumenta o emoji */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%; /* Deixa redondo */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.header-actions button:hover {
+    background-color: #f0f0f0;
+    border-color: #bbb;
+}
+
+/* Para o botão de adicionar, podemos dar destaque */
+#openAddModal {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+#openAddModal:hover {
+    background-color: #0056b3;
+}
+
+/* DARK MODE para o Header */
+body.dark-mode header {
+    background-color: #1e293b;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .header-actions button {
+    border-color: #444;
+    color: #e4e4e4;
+}
+body.dark-mode .header-actions button:hover {
+    background-color: #334155;
+}
+body.dark-mode #openAddModal {
+    background-color: #0056b3;
+}
+
+
+
+
+/* Em: style.css */
+
+/* 1. ESTILOS PARA O CONTÊINER EM MODO GRID */
+#videoContainer.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* 2. FAÇA OS ESTILOS DE CARD DEPENDEREM DA CLASSE .video-grid */
+/* Exemplo: Mude de .video-card para #videoContainer.video-grid .video-card */
+#videoContainer.video-grid .video-card {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    /* ... resto dos seus estilos de .video-card ... */
+}
+/* Faça isso para todas as regras relacionadas aos cards (.card-title, .card-actions, etc) */
+
+
+/* 3. ADICIONE OS ESTILOS PARA O CONTÊINER EM MODO LISTA (TABELA) */
+#videoContainer.video-list .table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#videoContainer.video-list table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#videoContainer.video-list thead {
+    background-color: #007bff;
+    color: #fff;
+}
+/* Adicione aqui TODOS os seus estilos antigos de tabela (th, td, tbody tr:hover, etc), 
+   sempre prefixando com #videoContainer.video-list */
+
+#videoContainer.video-list th, 
+#videoContainer.video-list td {
+    padding: 15px 20px;
+    text-align: left;
+    word-wrap: break-word;
+}
+/* ... e assim por diante para todos os estilos da tabela ... */
+
+body.dark-mode #videoContainer.video-list table {
+    background-color: #1e1e1e;
+    color: #f1f1f1;
+}
+/* ... e para todos os estilos de dark mode da tabela ... */
