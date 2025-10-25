@@ -1,9 +1,10 @@
 // =================================================================
 // 1. CONFIGURAÇÃO INICIAL E VARIÁVEIS GLOBAIS
 // =================================================================
+
 const firebaseConfig = {
     // ATENÇÃO: SUBSTITUA COM SUAS CHAVES REAIS DO FIREBASE
-    apiKey: "AIzaSyDKBTU8zUwcI5wQF6r0J1xIowXIpvMuDM", 
+    apiKey: "AIzaSyDKBTU8zUwcI5wQF6r0J1xIowXIpvMuDM",
     authDomain: "hyosbd-60588.firebaseapp.com",
     projectId: "hyosbd-60588",
     storageBucket: "hyosbd-60588.firebasestorage.app",
@@ -14,7 +15,27 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// =================================================================
+// HABILITA A PERSISTÊNCIA OFFLINE (MELHORIA APP MOBILE)
+// =================================================================
+try {
+    firebase.firestore().enablePersistence()
+      .catch((err) => {
+          if (err.code == 'failed-precondition') {
+              console.warn("Firestore: Persistência já ativa em outra aba.");
+          } else if (err.code == 'unimplemented') {
+              console.warn("Firestore: Navegador não suporta persistência.");
+          }
+      });
+} catch (e) {
+    console.error("Erro ao habilitar persistência: ", e);
+}
+// =================================================================
+
 const videosCollection = db.collection("videos");
+const tagsGeraisCollection = db.collection("tagsGerais"); 
+
 
 // Elementos
 const videoModal = document.getElementById('videoModal');
@@ -23,29 +44,39 @@ const openAddModalButton = document.getElementById('openAddModal');
 const addButton = document.getElementById('addButton');
 const message = document.getElementById('message');
 const videoList = document.getElementById('videoList');
-const tagSelector = document.getElementById('tagSelector');
 const activeFiltersContainer = document.getElementById('activeFilters');
-// NOVOS ELEMENTOS
 const filterContainer = document.getElementById('filterContainer');
 const toggleFilterButton = document.getElementById('toggleFilter');
 
+// ATENÇÃO: 'tags' agora é o elemento Select2 (jQuery) (Seletor do MODAL)
+const tagsSelect = $('#tags'); 
 
+const availableTagsList = document.getElementById('availableTagsList');
+const showAllButton = document.getElementById('showAllButton'); // NOVO ELEMENTO
 
 let activeTags = []; // Tags atualmente sendo usadas para filtrar (Chips)
-let allAvailableTags = new Set(); // Todas as tags encontradas nos vídeos (Dropdown)
+let masterTagList = []; // Lista MESTRA de todas as tags, vinda do 'tagsGeraisCollection'
+
 
 // =================================================================
 // 2. FUNÇÕES DO MODAL (ADICIONAR/EDITAR)
 // =================================================================
 
+// ... (Todas as funções do Modal (openModal, closeAndResetModal, saveNewTags, e o listener 'addButton') 
+// permanecem EXATAMENTE IGUAIS. Não há necessidade de alterá-las.) ...
+
 function openModal(isEdit = false, docId = null, data = {}) {
-    // Preenchimento do formulário
     document.getElementById('url').value = data.url || '';
     document.getElementById('titulo').value = data.titulo || '';
-    document.getElementById('tags').value = Array.isArray(data.tags) ? data.tags.join(', ') : '';
     document.getElementById('descricao').value = data.descricao || '';
-    message.textContent = ''; // Limpa mensagem
-
+    message.textContent = '';
+    const tagsParaSelect2 = Array.isArray(data.tags) ? data.tags.map(t => t.toLowerCase()) : [];
+    if(tagsSelect.data('select2')) {
+        tagsSelect.val(tagsParaSelect2).trigger('change'); 
+    } else {
+        initializeSelect2();
+        tagsSelect.val(tagsParaSelect2).trigger('change');
+    }
     if (isEdit) {
         document.getElementById('modalTitle').textContent = `Editar Vídeo: ${data.titulo}`;
         addButton.textContent = 'Salvar Edição';
@@ -55,61 +86,75 @@ function openModal(isEdit = false, docId = null, data = {}) {
         addButton.textContent = 'Adicionar ao Catálogo';
         delete addButton.dataset.editId;
     }
-
     videoModal.style.display = 'block';
 }
 
 function closeAndResetModal() {
     videoModal.style.display = 'none';
-    // Limpeza completa do formulário
     document.getElementById('url').value = '';
     document.getElementById('titulo').value = '';
-    document.getElementById('tags').value = '';
     document.getElementById('descricao').value = '';
+    tagsSelect.val(null).trigger('change');
     message.textContent = '';
     delete addButton.dataset.editId;
 }
 
-// Event Listeners do Modal
 openAddModalButton.addEventListener('click', () => openModal(false));
 closeModalButton.addEventListener('click', closeAndResetModal);
 window.addEventListener('click', (event) => {
-    if (event.target === videoModal) closeAndResetModal();
+    if (event.target === videoModal && !$(event.target).closest('.select2-container').length) {
+        closeAndResetModal();
+    }
 });
 
-// Event Listener para Adicionar/Editar
+async function saveNewTags(tagsArray) {
+    const promises = tagsArray.map(async tagText => {
+        const trimmedTagText = tagText.trim(); 
+        if(trimmedTagText.length === 0) return;
+        const tagId = trimmedTagText.toLowerCase();
+        const tagRef = tagsGeraisCollection.doc(tagId);
+        const doc = await tagRef.get();
+        if (!doc.exists) {
+            const capitalizedName = trimmedTagText.charAt(0).toUpperCase() + trimmedTagText.slice(1);
+            await tagRef.set({ nome: capitalizedName, dataCriacao: firebase.firestore.FieldValue.serverTimestamp() });
+        }
+    });
+    await Promise.all(promises);
+}
+
 addButton.addEventListener('click', async () => {
     const docId = addButton.dataset.editId;
     const url = document.getElementById('url').value;
     const titulo = document.getElementById('titulo').value;
-    const tagsInput = document.getElementById('tags').value;
     const descricao = document.getElementById('descricao').value;
-
-    if (!url || !titulo || !tagsInput) {
+    const tagsArray = tagsSelect.select2('data')
+        .map(item => item.text.trim())
+        .filter(tag => tag.length > 0);
+    
+    if (!url || !titulo || tagsArray.length === 0) {
         message.textContent = 'Erro: URL, Título e Tags são obrigatórios!';
         message.style.color = 'red';
         return;
     }
-
-    const tagsArray = tagsInput.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag.length > 0);
-    const videoData = { url, titulo, descricao, tags: tagsArray };
+    await saveNewTags(tagsArray);
+    const tagsArrayLowerCase = tagsArray.map(t => t.toLowerCase());
+    const videoData = { url, titulo, descricao, tags: tagsArrayLowerCase };
 
     try {
         if (docId) {
-            // MODO EDIÇÃO
             await videosCollection.doc(docId).update(videoData);
             message.textContent = `Vídeo "${titulo}" editado com sucesso!`;
         } else {
-            // MODO ADICIONAR (Adiciona o timestamp)
             videoData.dataAdicao = firebase.firestore.FieldValue.serverTimestamp();
             await videosCollection.add(videoData);
             message.textContent = `Vídeo "${titulo}" adicionado com sucesso!`;
         }
-
         message.style.color = 'green';
-        setTimeout(() => {
+        setTimeout(async () => {
             closeAndResetModal();
-            listarVideosComFiltro(); // Recarrega a lista
+            masterTagList = await loadPredefinedTags();
+            initializeSelect2(); 
+            listarVideosComFiltro(); 
         }, 1000);
     } catch (e) {
         console.error("Erro ao salvar documento: ", e);
@@ -123,59 +168,116 @@ addButton.addEventListener('click', async () => {
 // 3. LISTAGEM E FILTROS (Lógica AND)
 // =================================================================
 
-async function listarVideosComFiltro() {
-    // Colspan ajustado para 3 colunas (Título, Descrição, Ações)
-    videoList.innerHTML = '<tr><td colspan="3">Carregando vídeos...</td></tr>';
-    allAvailableTags.clear();
+// NOVA FUNÇÃO: Lista TODOS os vídeos, ignorando filtros
+async function listarTodosVideos() {
+    videoList.innerHTML = '<p>Carregando todos os vídeos...</p>';
+    
+    // Limpa quaisquer filtros ativos
+    activeTags = [];
+    renderActiveFilters();
+    renderAvailableTags();
+    
+    // Rola para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     let query = videosCollection.orderBy('dataAdicao', 'desc');
 
     try {
-        // Passo 1: Busca ampla OR no Firestore
+        let snapshot;
+        try {
+            snapshot = await query.get({ source: 'cache' });
+            if (snapshot.empty) {
+                snapshot = await query.get({ source: 'server' });
+            }
+        } catch(e) {
+            snapshot = await query.get({ source: 'server' });
+        }
+        
+        videoList.innerHTML = '';
+        if (snapshot.empty) {
+            videoList.innerHTML = '<p>Nenhum vídeo encontrado no catálogo.</p>';
+        } else {
+            snapshot.forEach(doc => {
+                renderVideoItem(doc.id, doc.data());
+            });
+        }
+    } catch (e) {
+        console.error("Erro ao listar todos os vídeos: ", e);
+        videoList.innerHTML = '<p style="color:red;">Ocorreu um erro ao buscar os dados.</p>';
+    }
+}
+
+
+// ATUALIZADA: Lista vídeos FILTRADOS
+async function listarVideosComFiltro() {
+
+    // Cláusula de Guarda: Se nenhum filtro estiver ativo, não faz a consulta.
+    if (activeTags.length === 0) {
+        videoList.innerHTML = '<p style="font-size: 1.1em; color: #888; text-align: center; margin-top: 50px;">Selecione uma tag acima para começar.</p>';
+        
+        // Atualiza a UI de filtros (para mostrar todas as tags como disponíveis)
+        renderActiveFilters();
+        renderAvailableTags();
+        return; // Para a execução da função aqui
+    }
+
+    videoList.innerHTML = '<p>Carregando vídeos...</p>';
+
+    let query; // A query não é mais definida por padrão
+
+    try {
+        // Passo 1: Definir a query base (agora só roda se activeTags.length > 0)
         if (activeTags.length === 1) {
             query = videosCollection.where('tags', 'array-contains', activeTags[0]).orderBy('dataAdicao', 'desc');
-        } else if (activeTags.length > 1) {
-            // array-contains-any busca qualquer vídeo que tenha PELO MENOS uma das tags
+        } else { // activeTags.length > 1
             query = videosCollection.where('tags', 'array-contains-any', activeTags).orderBy('dataAdicao', 'desc');
         }
 
-        const snapshot = await query.get();
+        let snapshot;
+        try {
+            snapshot = await query.get({ source: 'cache' });
+            if (snapshot.empty) {
+                snapshot = await query.get({ source: 'server' });
+            }
+        } catch(e) {
+            snapshot = await query.get({ source: 'server' });
+        }
+        
         let videosComDados = [];
-
         snapshot.forEach(doc => {
-            const data = doc.data();
-            // Coleta todas as tags de todos os vídeos visíveis (para o seletor)
-            if (Array.isArray(data.tags)) data.tags.forEach(tag => allAvailableTags.add(tag));
-            
-            videosComDados.push({ id: doc.id, data: data });
+            videosComDados.push({ id: doc.id, data: doc.data() });
         });
 
         // Passo 2: FILTRAGEM AND (E) no lado do cliente
         let videosFiltrados = videosComDados;
         if (activeTags.length > 1) {
             videosFiltrados = videosComDados.filter(video => {
-                // .every() garante que CADA tag ativa está no array de tags do vídeo
                 return activeTags.every(tag => video.data.tags.includes(tag));
             });
         }
         
-        // Passo 3: Renderização
+        // Passo 3: Renderização dos Vídeos
         videoList.innerHTML = '';
         if (videosFiltrados.length === 0) {
-            // Colspan ajustado para 3 colunas
-            videoList.innerHTML = '<tr><td colspan="3">Nenhum vídeo encontrado.</td></tr>';
+            videoList.innerHTML = '<p>Nenhum vídeo encontrado para esta combinação de filtros.</p>';
         } else {
             videosFiltrados.forEach(v => renderVideoItem(v.id, v.data));
         }
 
-        updateTagSelector();
-        renderActiveFilters(); // Garante que os chips são atualizados
+        // Passo 4: Renderização da UI de Filtro
+        renderActiveFilters(); // Renderiza os chips de filtros ativos
+        renderAvailableTags(); // Renderiza os chips de tags disponíveis
 
     } catch (e) {
         console.error("Erro na listagem/busca: ", e);
-        videoList.innerHTML = '<tr><td colspan="3" style="color:red;">Ocorreu um erro ao buscar os dados. Verifique o console.</td></tr>';
+        if(e.code === 'offline' || e.message.includes('offline')) {
+             videoList.innerHTML = '<p>Você está offline. Mostrando dados salvos...</p>';
+        } else {
+             videoList.innerHTML = '<p style="color:red;">Ocorreu um erro ao buscar os dados. Verifique o console.</p>';
+        }
     }
 }
+
 
 // ---------------------------------------------
 // Funções de Ação (Renderizar, Deletar)
@@ -186,8 +288,12 @@ function renderVideoItem(id, data) {
     card.className = 'video-card';
     card.id = `video-${id}`;
 
-    // Gera o HTML para as tags dentro do card
-    const tagsHtml = data.tags.map(tag => `<span class="card-tag">${tag}</span>`).join('');
+    const tagsHtml = data.tags.map(tagId => {
+        const tagObj = masterTagList.find(t => t.id === tagId);
+        const tagName = tagObj ? tagObj.text : tagId; 
+        
+        return `<span class="card-tag clickable-tag" data-tag-id="${tagId}">${tagName}</span>`;
+    }).join('');
 
     card.innerHTML = `
         <div class="card-content">
@@ -207,18 +313,24 @@ function renderVideoItem(id, data) {
     card.querySelector('.delete-btn').addEventListener('click', () => deletarVideo(id, data.titulo));
     card.querySelector('.edit-btn').addEventListener('click', () => openModal(true, id, data));
     
-    // ATENÇÃO: a videoList agora será uma div, não um tbody
-    videoList.appendChild(card); 
+    // Adiciona listeners de clique para as tags do card
+    card.querySelectorAll('.clickable-tag').forEach(tagSpan => {
+        tagSpan.addEventListener('click', (e) => {
+            const tagId = e.target.dataset.tagId;
+            addTagFilter(tagId); // Reutiliza a função de filtro existente
+        });
+    });
+
+    videoList.appendChild(card);
 }
 
 async function deletarVideo(id, titulo) {
     if (confirm(`Apagar "${titulo}"?`)) {
         try {
             await videosCollection.doc(id).delete();
-            // Remove o elemento da tela
-            document.getElementById(`video-${id}`)?.remove(); 
+            document.getElementById(`video-${id}`)?.remove();
             alert(`Vídeo "${titulo}" apagado com sucesso!`);
-            listarVideosComFiltro(); // Recarrega para atualizar o dropdown de tags
+            listarVideosComFiltro(); // Relista (pode mostrar a msg "Selecione..." se for o último)
         } catch(e) {
             console.error("Erro ao apagar:", e);
             alert("Erro ao apagar o vídeo.");
@@ -226,33 +338,24 @@ async function deletarVideo(id, titulo) {
     }
 }
 
-
 // ---------------------------------------------
 // Lógica do Seletor de Tags (Dropdown e Chips)
 // ---------------------------------------------
 
-function updateTagSelector() {
-    tagSelector.innerHTML = '<option value="">Selecione tags para filtrar...</option>';
-    Array.from(allAvailableTags)
-        .sort()
-        .forEach(tag => {
-            if (!activeTags.includes(tag)) {
-                const option = document.createElement('option');
-                option.value = tag;
-                option.textContent = tag.toUpperCase();
-                tagSelector.appendChild(option);
-            }
-        });
-}
-
 function renderActiveFilters() {
     activeFiltersContainer.innerHTML = '';
-    activeTags.forEach(tag => {
+    if(activeTags.length === 0) {
+        activeFiltersContainer.innerHTML = '<p style="font-size: 0.9em; color: #888;">Nenhum filtro ativo.</p>';
+    }
+    
+    activeTags.forEach(tagId => {
         const chip = document.createElement('div');
         chip.className = 'tag-chip';
+        const tagText = masterTagList.find(t => t.id === tagId)?.text || tagId.toUpperCase();
+        
         chip.innerHTML = `
-            ${tag.toUpperCase()} 
-            <span class="tag-chip-close" data-tag="${tag}">&times;</span>
+            ${tagText}
+            <span class="tag-chip-close" data-tag="${tagId}">&times;</span>
         `;
         activeFiltersContainer.appendChild(chip);
 
@@ -262,57 +365,97 @@ function renderActiveFilters() {
     });
 }
 
-function removeTagFilter(tag) {
-    activeTags = activeTags.filter(t => t !== tag);
-    listarVideosComFiltro(); // Refiltrar e atualizar UI
-}
-
-tagSelector.addEventListener('change', (e) => {
-    const tag = e.target.value;
-    if (tag && !activeTags.includes(tag)) {
-        activeTags.push(tag);
-        listarVideosComFiltro();
-        e.target.value = ''; // Reseta o dropdown
+function renderAvailableTags() {
+    availableTagsList.innerHTML = '';
+    
+    masterTagList
+        .sort((a, b) => a.text.localeCompare(b.text))
+        .forEach(tag => {
+            if (!activeTags.includes(tag.id)) {
+                const chip = document.createElement('div');
+                chip.className = 'available-tag-chip';
+                chip.innerHTML = `
+                    <span class="tag-text" data-tag-id="${tag.id}">${tag.text}</span>
+                    <span class="delete-tag-btn" data-tag-id="${tag.id}" data-tag-name="${tag.text}" title="Apagar Tag">&times;</span>
+                `;
+                chip.querySelector('.tag-text').addEventListener('click', (e) => {
+                    addTagFilter(e.target.dataset.tagId);
+                });
+                chip.querySelector('.delete-tag-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteTag(e.target.dataset.tagId, e.target.dataset.tagName);
+                });
+                availableTagsList.appendChild(chip);
+            }
+        });
+    
+    if(availableTagsList.innerHTML === '') {
+        availableTagsList.innerHTML = '<p style="font-size: 0.9em; color: #888;">Todas as tags estão ativas.</p>';
     }
-});
-
-
-// ---------------------------------------------
-// Lógica de Ordenação
-// ---------------------------------------------
-const headers = document.querySelectorAll('#videoTable th[data-column]');
-let sortDirection = 1;
-
-headers.forEach(header => {
-    header.addEventListener('click', () => {
-        const column = header.getAttribute('data-column');
-        sortTableByColumn(column);
-        sortDirection *= -1;
-    });
-});
-
-function sortTableByColumn(column) {
-    const rows = Array.from(videoList.querySelectorAll('tr'));
-    rows.sort((a, b) => {
-        const aText = a.querySelector(`td:nth-child(${getColumnIndex(column)})`)?.innerText.toLowerCase() || '';
-        const bText = b.querySelector(`td:nth-child(${getColumnIndex(column)})`)?.innerText.toLowerCase() || '';
-        return aText.localeCompare(bText) * sortDirection;
-    });
-    videoList.innerHTML = '';
-    rows.forEach(row => videoList.appendChild(row));
 }
 
-function getColumnIndex(columnName) {
-    // Array de colunas ATUALIZADO (Título=1, Descrição=2)
-    const columns = ['titulo', 'descricao']; 
-    return columns.indexOf(columnName) + 1;
+
+function addTagFilter(tagId) {
+    if (tagId && !activeTags.includes(tagId)) {
+        activeTags.push(tagId);
+        listarVideosComFiltro(); // Re-renderiza tudo
+
+        // Garante que o painel de filtro esteja visível
+        if (filterContainer.style.display !== 'block') {
+            filterContainer.style.display = 'block';
+            toggleFilterButton.textContent = '❌';
+        }
+        
+        // Rola a página para o topo para ver o filtro
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
+function removeTagFilter(tagId) {
+    activeTags = activeTags.filter(t => t !== tagId);
+    listarVideosComFiltro(); // Re-renderiza tudo (e vai mostrar msg inicial se activeTags == 0)
+}
+
+
 // =================================================================
-// 5. INICIALIZAÇÃO E DARK MODE
+// 4. INICIALIZAÇÃO E LÓGICA DO SELECT2 (DO MODAL)
 // =================================================================
 
-// Lógica de Alternância do Filtro
+async function loadPredefinedTags() {
+    try {
+        let snapshot = await tagsGeraisCollection.get({ source: 'cache' });
+        if (snapshot.empty) {
+            snapshot = await tagsGeraisCollection.get({ source: 'server' });
+        }
+        
+        const tags = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.nome) { 
+                tags.push({ id: data.nome.toLowerCase(), text: data.nome }); 
+            }
+        });
+        return tags;
+    } catch(e) {
+        console.error("Erro ao carregar tags gerais:", e);
+        return [];
+    }
+}
+
+function initializeSelect2() {
+    if (tagsSelect.data('select2')) {
+        tagsSelect.select2('destroy');
+    }
+    tagsSelect.select2({
+        data: masterTagList, 
+        placeholder: "Selecione ou digite tags (pesquisável)",
+        tags: true, 
+        tokenSeparators: [','] 
+    });
+}
+
+
+// Lógica de Alternância do Filtro (Botão 🔍)
 toggleFilterButton.addEventListener('click', () => {
     const isVisible = filterContainer.style.display === 'block';
     if (isVisible) {
@@ -324,38 +467,81 @@ toggleFilterButton.addEventListener('click', () => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Carrega lista completa
-    listarVideosComFiltro();
+
+// =================================================================
+// 5. FUNÇÕES DE GERENCIAMENTO DE TAGS (APAGAR)
+// =================================================================
+
+async function deleteTag(tagId, tagName) {
+    if (!confirm(`TEM CERTEZA?\n\nVocê está prestes a apagar a tag "${tagName}" (${tagId}) PERMANENTEMENTE.\n\nIsso irá remover a tag de TODOS os vídeos que a utilizam. Esta ação não pode ser desfeita.`)) {
+        return;
+    }
+    console.log(`Iniciando exclusão da tag: ${tagId}`);
+    try {
+        const videosQuery = videosCollection.where('tags', 'array-contains', tagId);
+        const snapshot = await videosQuery.get();
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+            const videoRef = videosCollection.doc(doc.id);
+            batch.update(videoRef, {
+                tags: firebase.firestore.FieldValue.arrayRemove(tagId)
+            });
+        });
+        const tagRef = tagsGeraisCollection.doc(tagId);
+        batch.delete(tagRef);
+        await batch.commit();
+        alert(`Tag "${tagName}" apagada com sucesso de ${snapshot.size} vídeos e do catálogo.`);
+        masterTagList = await loadPredefinedTags();
+        initializeSelect2();
+        listarVideosComFiltro(); // Re-renderiza UI (vai mostrar msg inicial se filtros estiverem vazios)
+    } catch (e) {
+        console.error("Erro ao apagar a tag:", e);
+        alert(`Ocorreu um erro ao apagar a tag: ${e.message}`);
+    }
+}
+
+
+// =================================================================
+// 6. INICIALIZAÇÃO DA PÁGINA
+// =================================================================
+
+document.addEventListener('DOMContentLoaded', async () => {
     
-    // 2. Lógica Dark Mode (MANTIDA)
+    // 1. CARREGA A LISTA MESTRA DE TAGS PRIMEIRO
+    masterTagList = await loadPredefinedTags();
+
+    // 2. Carrega e inicializa o Select2 (do modal)
+    initializeSelect2();
+    
+    // 3. Renderiza filtros e mensagem inicial (SEM carregar vídeos)
+    renderActiveFilters();
+    renderAvailableTags();
+    videoList.innerHTML = '<p style="font-size: 1.1em; color: #888; text-align: center; margin-top: 50px;">Selecione uma tag acima para começar.</p>';
+
+    // 4. Lógica Dark Mode (MANTIDA)
     const toggleDarkMode = document.getElementById('toggleDarkMode');
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-
     if (savedDarkMode) {
         document.body.classList.add('dark-mode');
         toggleDarkMode.textContent = '☀️';
     } else {
         toggleDarkMode.textContent = '🌙';
     }
-
     toggleDarkMode.addEventListener('click', () => {
         const darkModeAtivo = document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', darkModeAtivo);
-
-        toggleDarkMode.textContent = darkModeAtivo
-            ? '☀️'
-            : '🌙';
+        toggleDarkMode.textContent = darkModeAtivo ? '☀️' : '🌙';
     });
 
-    // 3. Lógica de Deep Link (AGORA DENTRO DO DOMContentLoaded no script.js)
+    // 5. NOVO: Listener para o botão "Mostrar Todos"
+    showAllButton.addEventListener('click', listarTodosVideos);
+
+    // 6. Lógica de Deep Link (MANTIDA)
     const params = new URLSearchParams(window.location.search);
     const sharedLink = params.get('link');
-    
     if (sharedLink) {
         const modal = document.getElementById('videoModal');
         const urlInput = document.getElementById('url');
-        
         if (modal && urlInput) {
             modal.style.display = 'block';
             urlInput.value = decodeURIComponent(sharedLink);

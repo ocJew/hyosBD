@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Catálogo de Vídeos da Internet</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a"> 
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
+
 <body>
+
     <header>
         <h1>Catálogo de Vídeos</h1>
         <div class="header-actions">
@@ -22,33 +34,38 @@
     <main>
         <section class="filter-area" id="filterContainer">
             <h2>Filtro de Conteúdo</h2>
-            <select id="tagSelector">
-                <option value="">Selecione tags para filtrar...</option>
-            </select>
-            
+
+            <h3 style="margin-bottom: 10px;">Filtros Ativos:</h3>
             <div id="activeFilters" class="active-filters-container">
                 </div>
-        </section>
 
-        
+            <h3 style="margin-top: 25px; margin-bottom: 10px;">Tags Disponíveis:</h3>
+            <div id="availableTagsList" class="available-tags-container">
+                </div>
+            
+            <button id="showAllButton" class="show-all-button">Mostrar Todos os Vídeos</button>
+
+        </section>
 
         <section class="results-area">
             <h2>Resultados Encontrados:</h2>
             <div id="videoList" class="video-grid">
-                </div>
+            </div>
         </section>
-
     </main>
 
     <div id="videoModal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeModal">&times;</span>
             <h2 id="modalTitle">Adicionar Novo Vídeo</h2>
-            
+
             <section class="admin-form" id="admin-form-section">
                 <input type="url" id="url" placeholder="Link do Vídeo (YouTube, TikTok, etc.)" required>
                 <input type="text" id="titulo" placeholder="Título do Vídeo" required>
-                <input type="text" id="tags" placeholder="Tags (separadas por vírgula, ex: caneta, drible, humor)" required>
+
+                <select id="tags" multiple="multiple" style="width: 100%;" required>
+                </select>
+
                 <textarea id="descricao" placeholder="Descrição ou utilidade"></textarea>
                 <button id="addButton">Salvar Vídeo</button>
                 <p id="message"></p>
@@ -57,4 +74,5 @@
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
