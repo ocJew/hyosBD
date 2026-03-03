@@ -1,194 +1,367 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ======== CONFIGURAÇÃO UNIVERSAL ======== */
+/* ======== DESIGN SYSTEM (TOKENS) ======== */
+:root {
+    /* Light Mode Palette - Indigo & Cyan */
+    --primary: #6366f1;
+    /* indigo-500 */
+    --primary-hover: #4f46e5;
+    /* indigo-600 */
+    --secondary: #06b6d4;
+    /* cyan-500 */
+    --secondary-hover: #0891b2;
+    /* cyan-600 */
+    --bg-main: #f8fafc;
+    /* slate-50 */
+    --bg-card: rgba(255, 255, 255, 0.8);
+    --bg-header: rgba(255, 255, 255, 0.7);
+    --text-main: #1e293b;
+    /* slate-800 */
+    --text-muted: #64748b;
+    /* slate-500 */
+    --border: rgba(226, 232, 240, 0.8);
+    /* slate-200 */
+    --accent-red: #ef4444;
+    /* red-500 */
+    --accent-green: #10b981;
+    /* emerald-500 */
+    --accent-yellow: #f59e0b;
+    /* amber-500 */
 
-*, *::before, *::after {
+    /* Effects */
+    --glass-blur: 12px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius: 1rem;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-mode {
+    --primary: #818cf8;
+    /* indigo-400 */
+    --primary-hover: #6366f1;
+    /* indigo-500 */
+    --secondary: #22d3ee;
+    /* cyan-400 */
+    --secondary-hover: #06b6d4;
+    /* cyan-500 */
+    --bg-main: #0f172a;
+    /* slate-900 */
+    --bg-card: rgba(30, 41, 59, 0.7);
+    --bg-header: rgba(30, 41, 59, 0.6);
+    --text-main: #f1f5f9;
+    /* slate-100 */
+    --text-muted: #94a3b8;
+    /* slate-400 */
+    --border: rgba(51, 65, 85, 0.5);
+    /* slate-700 */
+}
+
+/* ======== RESET & BASE ======== */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-* {
-    font-size: 17px;
+html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
 }
-
-/* Define o estado inicial da seção de filtro como escondido */
-#filterContainer {
-    display: none;
-    transition: all 0.3s ease-in-out;
-}
-
-/* ======== BASE (Comportamento para Desktop) ======== */
 
 body {
-    /* NOVA FONTE */
     font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 20px;
+    font-size: 16px;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
     min-height: 100vh;
-    /* CORES SUAVIZADAS */
-    background-color: #f8f9fa;
-    color: #343a40;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    padding: 24px;
+    overscroll-behavior-y: contain;
 }
 
-/* HEADER */
+/* ======== UTILITIES ======== */
+.glass {
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+/* ======== HEADER ======== */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     max-width: 1200px;
-    margin: 0 auto 30px auto;
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin: 0 auto 32px auto;
+    padding: 16px 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 24px;
+    z-index: 50;
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background-color: var(--bg-header);
+    border: 1px solid var(--border);
 }
 
 header h1 {
-    font-size: 1.5em;
-    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* CORREÇÃO: Força um layout de grade no contêiner dos botões */
 .header-actions {
-    display: grid;
-    /* Cria 2 colunas, cada uma com o tamanho exato de um botão (44px) */
-    grid-template-columns: repeat(2, 44px); 
-    gap: 8px; /* Espaço entre os botões */
-    justify-content: end; /* Alinha a grade inteira à direita do header */
-}
-
-/* CORREÇÃO: Centraliza o último botão se ele for ímpar (3 botões) */
-.header-actions button:last-child:nth-child(odd) {
-    grid-column: 1 / -1; /* Faz o botão ocupar a largura das 2 colunas */
-    justify-self: center; /* Centraliza o botão dentro desse espaço */
+    display: flex;
+    gap: 12px;
 }
 
 .header-actions button {
-    background-color: transparent;
-    border: 1px solid #ccc;
-    color: #555;
-    font-size: 1.5em;
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    display: inline-flex;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-main);
+    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: var(--transition);
+    font-size: 1.2rem;
 }
 
 .header-actions button:hover {
-    background-color: #f0f0f0;
-    border-color: #bbb;
+    background-color: var(--border);
+    transform: translateY(-2px);
 }
 
 #openAddModal {
-    background-color: #007bff;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     border: none;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 #openAddModal:hover {
-    background-color: #0056b3;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px) scale(1.05);
 }
 
-
-/* MAIN */
+/* ======== MAIN LAYOUT ======== */
 main {
     max-width: 1200px;
-    width: 95%;
-    margin: 30px auto;
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
-    box-shadow: none;
+    margin: 0 auto;
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 section {
-    margin-bottom: 30px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    transition: border-color 0.3s, background-color 0.3s;
+    margin-bottom: 40px;
 }
 
-input[type="text"],
-input[type="url"],
-textarea,
-select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #bbb;
-    border-radius: 6px;
-    background-color: #fff;
-    color: #222;
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+/* ======== FILTERS ======== */
+#filterContainer {
+    display: none;
+    padding: 24px;
+    border-radius: var(--radius);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+    animation: slideDown 0.3s ease-out;
 }
 
-button {
-    padding: 10px 15px;
-    background-color: #007bff;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.active-filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tag-chip {
+    padding: 6px 14px;
+    background: var(--primary);
     color: white;
-    border: none;
-    border-radius: 6px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: pop 0.2s ease-out;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.8);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.tag-chip-close {
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
+    font-weight: bold;
+    font-size: 1rem;
+    line-height: 1;
 }
 
-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.03);
+.available-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-/* ======== LAYOUT DE CARDS ======== */
+.available-tag-chip {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: var(--transition);
+}
 
+.available-tag-chip:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.available-tag-chip .tag-text {
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.available-tag-chip .delete-tag-btn {
+    padding: 6px 10px;
+    border-left: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.available-tag-chip .delete-tag-btn:hover {
+    background-color: var(--accent-red);
+    color: white;
+}
+
+.show-all-button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 12px;
+    background: transparent;
+    border: 2px solid var(--accent-green);
+    color: var(--accent-green);
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.show-all-button:hover {
+    background-color: var(--accent-green);
+    color: white;
+}
+
+/* ======== VIDEO GRID & CARDS ======== */
 .video-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 24px;
 }
 
 .video-card {
-    background-color: #fff;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
 }
 
 .video-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .card-content {
-    padding: 18px;
+    padding: 20px;
+    flex-grow: 1;
 }
 
 .card-title {
-    font-size: 1.1em;
-    font-weight: 600;
-    margin: 0 0 8px 0;
-    color: #1a1a1a;
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-main);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
 }
 
 .card-description {
-    font-size: 0.9em;
-    color: #555;
-    line-height: 1.5;
-    margin-bottom: 12px;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
+    overflow: hidden;
 }
 
 .card-tags-container {
@@ -198,596 +371,400 @@ button:hover {
 }
 
 .card-tag {
-    background-color: #eef5ff;
-    color: #0056b3;
-    font-size: 0.75em;
-    font-weight: 500;
+    background-color: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
     padding: 4px 10px;
-    border-radius: 15px;
-    /* NOVO: Estilos para feedback de clique */
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
 }
-
-.card-tag:hover {
-    background-color: #d1e6ff; /* Um tom mais escuro de azul claro */
-    transform: scale(1.05);
-}
-
-.card-tag:active {
-    transform: scale(0.98); /* Efeito de clique */
-}
-
 
 .card-actions {
+    padding: 16px 20px;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-top: 1px solid var(--border);
     display: flex;
     gap: 8px;
-    padding: 12px 18px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #e0e0e0;
 }
 
 .action-btn {
-    padding: 8px 10px;
-    border: none;
+    padding: 8px 12px;
     border-radius: 8px;
-    font-size: 1em;
-}
-
-.action-btn.play-btn {
-    background-color: #28a745;
-    color: white;
-    text-decoration: none;
-}
-
-.action-btn.edit-btn {
-    background-color: #ffc107;
-    color: #222;
-}
-
-.action-btn.delete-btn {
-    background-color: #dc3545;
-    color: white;
-}
-
-
-/* ======== FILTRO DE TAGS (Chips) ======== */
-
-.active-filters-container {
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    min-height: 20px; /* Mantém a altura mesmo vazio */
-}
-
-/* Chip de Filtro Ativo */
-.tag-chip {
-    display: inline-flex;
     align-items: center;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 20px;
-    font-size: 0.9em;
-    font-weight: 500;
-    transition: background-color 0.3s, transform 0.1s, opacity 0.1s;
-}
-
-.tag-chip-close {
-    margin-left: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1.1em;
-    line-height: 1;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-}
-
-.tag-chip-close:hover {
-    opacity: 1;
-}
-
-/* NOVA ÁREA DE TAGS DISPONÍVEIS */
-.available-tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.available-tag-chip {
-    display: inline-flex;
-    align-items: center;
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    font-size: 0.9em;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    overflow: hidden; /* Garante que o border-radius funcione */
-}
-
-.available-tag-chip .tag-text {
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s, opacity 0.1s;
-}
-.available-tag-chip .tag-text:hover {
-    background-color: #e0e0e0;
-}
-
-.available-tag-chip .delete-tag-btn {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #aaa;
-    padding: 6px 10px;
-    margin-left: 0;
-    border-left: 1px solid #ccc;
-    line-height: 1;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.available-tag-chip .delete-tag-btn:hover {
-    color: white;
-    background-color: #dc3545;
-    border-left-color: #dc3545;
-}
-
-/* NOVO: Botão de "Mostrar Todos" */
-.show-all-button {
-    width: 100%;
-    margin-top: 25px;
-    padding: 12px;
-    font-size: 1em;
-    font-weight: 500;
-    background-color: #28a745; /* Cor verde */
-}
-
-.show-all-button:hover {
-    background-color: #218838;
-}
-
-
-/* ======== MODAL (Página Flutuante) ======== */
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-    padding-top: 50px;
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 30px;
-    border-radius: 12px;
-    width: 80%;
-    max-width: 600px;
-    position: relative;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s;
-}
-
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.3s;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: #000;
+    gap: 6px;
     text-decoration: none;
+    flex: 1;
+    justify-content: center;
 }
 
-
-/* ======== DARK MODE (Estilos) ======== */
-
-body.dark-mode {
-    /* Paleta 'Slate' (cinza-azulado) */
-    background-color: #0f172a; /* slate-900 */
-    color: #e2e8f0; /* slate-200 */
+.play-btn {
+    background-color: var(--accent-green);
+    color: white;
 }
 
-body.dark-mode header {
-    background-color: #1e293b; /* slate-800 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.edit-btn {
+    background-color: var(--accent-yellow);
+    color: white;
+    flex: 0;
 }
 
-body.dark-mode .header-actions button {
-    border-color: #334155; /* slate-700 */
-    color: #e2e8f0; /* slate-200 */
+.delete-btn {
+    background-color: var(--accent-red);
+    color: white;
+    flex: 0;
 }
 
-body.dark-mode .header-actions button:hover {
-    background-color: #334155; /* slate-700 */
-}
-
-/* Cor de destaque 'Sky' (azul-céu) */
-body.dark-mode #openAddModal {
-    background-color: #0ea5e9; /* sky-500 */
-    border-color: #0ea5e9;
-}
-body.dark-mode #openAddModal:hover {
-    background-color: #0284c7; /* sky-600 */
-}
-
-
-body.dark-mode main {
-    /* Remove o fundo e sombra do main para um layout mais limpo */
-    background-color: transparent; 
-    box-shadow: none;
-}
-
-body.dark-mode section {
-    border-color: #334155; /* slate-700 */
-    background-color: #1e293b; /* slate-800 */
-}
-
-body.dark-mode input[type="text"],
-body.dark-mode input[type="url"],
-body.dark-mode textarea,
-body.dark-mode select {
-    background-color: #334155; /* slate-700 */
-    color: #e2e8f0; /* slate-200 */
-    border-color: #475569; /* slate-600 */
-}
-
-body.dark-mode input:focus,
-body.dark-mode textarea:focus,
-body.dark-mode select:focus {
-    border-color: #0ea5e9; /* sky-500 */
-    box-shadow: 0 0 4px rgba(14, 165, 233, 0.4);
-}
-
-body.dark-mode .video-card {
-    background-color: #1e293b; /* slate-800 */
-    border-color: #334155; /* slate-700 */
-}
-
-body.dark-mode .video-card:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    transform: translateY(-5px);
-}
-
-body.dark-mode .card-title {
-    color: #f1f5f9; /* slate-100 */
-}
-
-body.dark-mode .card-description {
-    color: #94a3b8; /* slate-400 */
-}
-
-body.dark-mode .card-tag {
-    /* Tag do card com tom de azul mais sutil */
-    background-color: #1e40af; /* blue-800 */
-    color: #dbeafe; /* blue-200 */
-    font-weight: 500;
-    /* NOVO: Estilos de clique para dark mode */
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-body.dark-mode .card-tag:hover {
-    background-color: #1d4ed8; /* blue-700, um tom mais claro */
+.action-btn:hover {
+    filter: brightness(110%);
     transform: scale(1.05);
 }
 
-body.dark-mode .card-tag:active {
-    transform: scale(0.98);
+/* ======== MODAL ======== */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-
-body.dark-mode .card-actions {
-    background-color: #1e293b; /* slate-800 */
-    border-top-color: #334155; /* slate-700 */
+.modal-content {
+    background-color: var(--bg-main);
+    width: 100%;
+    max-width: 500px;
+    border-radius: var(--radius);
+    padding: 32px;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Botões com cor de destaque */
-body.dark-mode button {
-    background-color: #0ea5e9; /* sky-500 */
-    color: white;
-}
-body.dark-mode button:hover {
-    background-color: #0284c7; /* sky-600 */
-}
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
 
-/* Exceções para botões de ação do card */
-body.dark-mode .action-btn.edit-btn {
-    background-color: #ffc107;
-    color: #222;
-}
-body.dark-mode .action-btn.delete-btn {
-    background-color: #dc3545;
-    color: white;
-}
-body.dark-mode .action-btn.play-btn {
-    background-color: #28a745;
-    color: white;
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-/* NOVO: Botão "Mostrar Todos" em Dark Mode */
-body.dark-mode .show-all-button {
-    background-color: #28a745;
-}
-body.dark-mode .show-all-button:hover {
-    background-color: #218838;
-}
-
-
-/* Tag de FILTRO ATIVO */
-body.dark-mode .tag-chip {
-    background-color: #0ea5e9; /* sky-500 */
-    color: white;
+.close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
 }
 
-/* Tag DISPONÍVEL */
-body.dark-mode .available-tag-chip {
-    background-color: #334155;
-    color: #e2e8f0;
-    border-color: #475569;
-}
-
-body.dark-mode .available-tag-chip .tag-text:hover {
-    background-color: #475569;
-}
-
-body.dark-mode .available-tag-chip .delete-tag-btn {
-    color: #64748b;
-    border-left-color: #475569;
-}
-
-body.dark-mode .available-tag-chip .delete-tag-btn:hover {
-    color: white;
-    background-color: #dc3545;
-    border-left-color: #dc3545;
-}
-
-
-body.dark-mode .modal-content {
-    background-color: #1e293b; /* slate-800 */
-}
-
-body.dark-mode .close-button {
-    color: #94a3b8; /* slate-400 */
-}
-
-body.dark-mode .close-button:hover {
-    color: #e2e8f0; /* slate-200 */
-}
-
-
-/* ======== ESTILOS SELECT2 GERAIS (CORREÇÃO FINAL DO X) ======== */
-
-/* Contêiner Principal */
-.select2-container--default .select2-selection--multiple {
-    border: 1px solid #bbb !important;
-    border-radius: 6px !important;
-    min-height: 40px;
-    padding: 2px 5px;
-    background-color: #fff !important;
-    margin-bottom: 10px; 
-}
-
-/* Foco */
-.select2-container--default.select2-container--focus .select2-selection--multiple {
-    border-color: #007bff !important;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
-}
-
-/* Campo de pesquisa dentro da seleção */
-.select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
-    background-color: transparent !important;
-    color: #222 !important;
-}
-
-/* ************************************************* */
-/* SOLUÇÃO DE SOBREPOSIÇÃO MAIS ROBUSTA              */
-/* ************************************************* */
-
-/* Item de tag (chip) - CORREÇÃO E TENTATIVA DE ALINHAR TEXTO À DIREITA */
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #007bff;
-    color: white;
-    border: 1px solid #0056b3;
-    border-radius: 4px;
-    font-size: 0.9em;
-    
-    /* Configuração de Layout */
-    display: flex;
-    align-items: center; /* Centraliza verticalmente */
-    
-    /* Padding para afastar o texto do X na esquerda */
-    padding: 2px 8px 2px 4px; 
-    
-    /* Margem dos chips */
-    margin: 3px 0 3px 5px; 
-    
-    /* Garante que o texto longo seja tratado corretamente */
-    min-width: 0; 
-    width: auto;
-}
-
-/* Botão de remoção (X) - Força à Esquerda */
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-    float: none; 
-    order: -1; 
-    color: white;
-    font-weight: bold;
-    font-size: 1.1em; 
-    line-height: 1; 
-    margin: 0; 
-    padding: 0;
-    margin-right: 5px; /* Espaço entre X e Texto */
-}
-
-/* **NOVO HACK:** Força o texto da tag a ocupar o espaço restante e alinhar à direita */
-.select2-container--default .select2-selection--multiple .select2-selection__choice > * {
-    /* Esta regra afeta TODOS os filhos do LI, incluindo o texto não embrulhado */
-    flex-grow: 1; /* Ocupa o máximo de espaço possível */
-    text-align: right; /* Alinha o conteúdo à direita */
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-/* Garante que o span do 'X' não receba as regras acima */
-.select2-container--default .select2-selection--multiple .select2-selection__choice > .select2-selection__choice__remove {
-    flex-grow: 0;
-    text-align: left; /* Garante que o X não seja afetado */
-}
-
-
-/* Garante que o texto da tag seja o segundo item */
-.select2-container--default .select2-selection--multiple .select2-selection__choice span {
-    order: 1;
-}
-
-/* ======== ESTILOS SELECT2 DARK MODE ESPECÍFICOS ======== */
-
-body.dark-mode .select2-container--default .select2-selection--multiple {
-    background-color: #334155 !important; /* slate-700 */
-    border-color: #475569 !important; /* slate-600 */
-}
-/* Cor do texto do chip no DARK MODE */
-body.dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #0ea5e9; /* sky-500 */
-    color: #ffffff; 
-    border-color: #0284c7; /* sky-600 */
-}
-
-/* Campo de pesquisa dentro da seleção no Dark Mode */
-body.dark-mode .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
-    background-color: transparent !important;
-    color: #e2e8f0 !important; /* slate-200 */
-}
-
-/* Fundo do dropdown no Dark Mode */
-body.dark-mode .select2-dropdown {
-    background-color: #1e293b !important; /* slate-800 */
-    border-color: #334155 !important; /* slate-700 */
-}
-
-/* Texto das opções no Dark Mode (sem !important) */
-body.dark-mode .select2-container--default .select2-results__option {
-    color: #e2e8f0; /* slate-200 */
-}
-
-/* ========================================================== */
-/* CORREÇÃO DEFINITIVA: Opção já selecionada (quando NÃO está em hover)
-/* Mirando em [aria-selected="true"] E TAMBÉM .select2-results__option--selected 
-/* ========================================================== */
-
-body.dark-mode .select2-container--default .select2-results__option[aria-selected="true"],
-body.dark-mode .select2-container--default .select2-results__option.select2-results__option--selected {
-    background-color: #334155 !important; /* Fundo (slate-700) */
-    color: #94a3b8 !important; /* Texto (slate-400) - cor "apagada" */
-}
-
-/* Opção em Destaque (ao passar o mouse) no Dark Mode */
-/* Esta regra (que já funciona) deve vir DEPOIS da correção acima */
-body.dark-mode .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-    background-color: #0ea5e9 !important; /* sky-500 */
-    color: white !important; 
-}
-
-/* Input de pesquisa do dropdown (no Dark Mode) */
-body.dark-mode .select2-search--dropdown .select2-search__field {
-    background-color: #334155 !important; /* slate-700 */
-    color: #e2e8f0 !important; /* slate-200 */
-    border: 1px solid #475569 !important; /* slate-600 */
-}
-
-
-/* ======== MELHORIAS DE UX NATIVA-MOBILE ======== */
-
-/* 1. Remove o "flash" azul/cinza ao tocar em links/botões no mobile */
-html {
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* 2. Impede o "scroll elástico" que mostra o fundo branco (parece menos um app) */
-body {
-    overscroll-behavior-y: contain;
-}
-
-/* 3. Impede que o usuário selecione texto acidentalmente em botões e cards */
-button,
-.action-btn,
-.video-card .card-content,
-.header-actions,
-.tag-chip,
-.available-tag-chip .tag-text,
-.available-tag-chip .delete-tag-btn,
-.show-all-button,
-.card-tag {
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none;     /* IE 10+ */
-    user-select: none;         /* Padrão */
-}
-
-/* 4. Permite seleção de texto ONDE FAZ SENTIDO (inputs e descrições) */
-input, 
+/* ======== FORM ELEMENTS ======== */
+input,
 textarea,
-.card-title,
-.card-description {
-     -webkit-user-select: auto;
-    -ms-user-select: auto;
-    user-select: auto;
+select {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    transition: var(--transition);
 }
 
-/* 5. Adiciona feedback de toque "pressionado" (nativo) */
-.action-btn:active,
-.available-tag-chip .tag-text:active,
-.tag-chip:active,
-.header-actions button:active,
-.show-all-button:active,
-.card-tag:active {
-    transform: scale(0.95); /* Leve "afundada" */
-    opacity: 0.8;
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
+#addButton {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
 
-/* ======== RESPONSIVO (Ajustes Finais para Celular) ======== */
+#addButton:hover {
+    filter: brightness(110%);
+    transform: translateY(-1px);
+}
 
-@media (max-width: 700px) {
-    body {
-        padding: 0;
-        overflow-x: hidden;
+/* ======== SEARCH BAR ======== */
+.search-and-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-container {
+    position: relative;
+    max-width: 300px;
+    width: 100%;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+}
+
+#searchInput {
+    padding: 10px 16px 10px 40px;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    background-color: var(--bg-main);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    width: 100%;
+}
+
+#searchInput:focus {
+    border-color: var(--primary);
+    background-color: var(--bg-card);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* ======== TOAST NOTIFICATIONS ======== */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 200;
+}
+
+.toast {
+    padding: 14px 20px;
+    border-radius: 12px;
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(var(--glass-blur));
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
     }
-    main {
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast.success {
+    border-left: 4px solid var(--accent-green);
+}
+
+.toast.error {
+    border-left: 4px solid var(--accent-red);
+}
+
+.toast.info {
+    border-left: 4px solid var(--primary);
+}
+
+.toast-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.toast.success .toast-icon {
+    color: var(--accent-green);
+}
+
+.toast.error .toast-icon {
+    color: var(--accent-red);
+}
+
+.toast.info .toast-icon {
+    color: var(--primary);
+}
+
+/* ======== LOADING SKELETONS ======== */
+.skeleton {
+    background: linear-gradient(90deg,
+            rgba(0, 0, 0, 0.05) 25%,
+            rgba(0, 0, 0, 0.1) 50%,
+            rgba(0, 0, 0, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite linear;
+    border-radius: 4px;
+}
+
+body.dark-mode .skeleton {
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes skeletonLoading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-card {
+    height: 250px;
+    border-radius: var(--radius);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.skeleton-title {
+    height: 24px;
+    width: 80%;
+}
+
+.skeleton-description {
+    height: 60px;
+    width: 100%;
+}
+
+.skeleton-tags {
+    height: 20px;
+    width: 50%;
+}
+
+.skeleton-actions {
+    height: 40px;
+    margin-top: auto;
+}
+
+/* ======== MOBILE ADJUSTMENTS (SEARCH) ======== */
+@media (max-width: 900px) {
+    .search-and-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        gap: 12px;
         width: 100%;
+    }
+
+    .search-container {
         max-width: none;
-        margin: 0;
-        padding: 10px;
     }
-    .actions button,
-    .actions a {
-        padding: 6px 8px;
-        font-size: 0.75em;
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
     }
-    .actions {
-        gap: 4px;
+
+    header h1 {
+        width: 100%;
+        text-align: center;
     }
-    .modal-content {
-        width: 95%;
-        margin: 5% auto;
-        padding: 20px;
+}
+
+/* ======== MOBILE ADJUSTMENTS ======== */
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
     }
+
+    header {
+        top: 16px;
+        padding: 12px 16px;
+    }
+
+    header h1 {
+        font-size: 1.25rem;
+    }
+
     .video-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 15px;
+        grid-template-columns: 1fr;
     }
+
+    .modal-content {
+        padding: 24px;
+    }
+}
+
+/* ======== SELECT2 CUSTOMIZATION (PREMIUM) ======== */
+.select2-container--default .select2-selection--multiple {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    min-height: 48px;
+    padding: 4px 8px;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 4px 10px !important;
+    font-weight: 500;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: white !important;
+    margin-right: 8px !important;
+    border: none !important;
+}
+
+body.dark-mode .select2-dropdown {
+    background-color: var(--bg-main) !important;
+    border-color: var(--border) !important;
+}
+
+body.dark-mode .select2-results__option {
+    color: var(--text-main);
+}
+
+body.dark-mode .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--primary) !important;
 }

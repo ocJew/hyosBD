@@ -8,10 +8,13 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a"> 
-    
+    <meta name="theme-color" content="#0f172a">
+
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -22,12 +25,20 @@
 
 <body>
 
-    <header>
+    <header class="glass">
         <h1>Catálogo de Vídeos</h1>
-        <div class="header-actions">
-            <button id="toggleDarkMode" title="Alternar tema">🌙</button>
-            <button id="toggleFilter" title="Filtrar">🔍</button>
-            <button id="openAddModal" title="Adicionar Vídeo">+</button>
+
+        <div class="search-and-actions">
+            <div class="search-container">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Pesquisar títulos ou descrições..." autocomplete="off">
+            </div>
+
+            <div class="header-actions">
+                <button id="toggleDarkMode" title="Alternar tema"><i data-lucide="moon"></i></button>
+                <button id="toggleFilter" title="Filtrar"><i data-lucide="filter"></i></button>
+                <button id="openAddModal" title="Adicionar Vídeo"><i data-lucide="plus"></i></button>
+            </div>
         </div>
     </header>
 
@@ -37,18 +48,18 @@
 
             <h3 style="margin-bottom: 10px;">Filtros Ativos:</h3>
             <div id="activeFilters" class="active-filters-container">
-                </div>
+            </div>
 
             <h3 style="margin-top: 25px; margin-bottom: 10px;">Tags Disponíveis:</h3>
             <div id="availableTagsList" class="available-tags-container">
-                </div>
-            
+            </div>
+
             <button id="showAllButton" class="show-all-button">Mostrar Todos os Vídeos</button>
 
         </section>
 
         <section class="results-area">
-            <h2>Resultados Encontrados:</h2>
+            <h2><i data-lucide="layout-grid"></i> Vídeos Disponíveis</h2>
             <div id="videoList" class="video-grid">
             </div>
         </section>
@@ -72,7 +83,13 @@
             </section>
         </div>
     </div>
+    <div id="toastContainer" class="toast-container"></div>
+
     <script src="script.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
 </body>
 
 </html>
